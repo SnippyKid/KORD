@@ -396,6 +396,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.video-card').forEach(card => {
         const video = card.querySelector('video');
         
+        // Set volume to 30% for all videos
+        if (video) {
+            video.volume = 0.3;
+        }
+        
         card.addEventListener('mouseenter', () => {
             gsap.to(card, {
                 scale: 1.08,
@@ -403,7 +408,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 duration: 0.4,
                 ease: 'power2.out'
             });
-            if (video) video.play();
+            if (video) {
+                video.volume = 0.3; // Ensure volume is set before playing
+                video.play();
+            }
         });
         
         card.addEventListener('mouseleave', () => {
@@ -414,6 +422,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 ease: 'power2.out'
             });
             if (video) video.pause();
+        });
+    });
+    
+    // Set volume for all videos on page load
+    document.querySelectorAll('video').forEach(video => {
+        video.volume = 0.3;
+        video.addEventListener('loadedmetadata', () => {
+            video.volume = 0.3;
         });
     });
 
