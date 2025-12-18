@@ -3,42 +3,47 @@ document.addEventListener('DOMContentLoaded', function() {
     // Register GSAP ScrollTrigger plugin
     gsap.registerPlugin(ScrollTrigger);
 
-    // Custom Cursor
+    // Check if device supports hover (desktop) vs touch (mobile)
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    
+    // Custom Cursor - only for non-touch devices
     const cursor = document.querySelector('.custom-cursor');
     const cursorFollower = document.querySelector('.cursor-follower');
+    
+    if (!isTouchDevice && cursor && cursorFollower) {
+        document.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.1
+            });
+            gsap.to(cursorFollower, {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.3
+            });
+        });
 
-    document.addEventListener('mousemove', (e) => {
-        gsap.to(cursor, {
-            x: e.clientX,
-            y: e.clientY,
-            duration: 0.1
+        // Cursor hover effects
+        const hoverElements = document.querySelectorAll('a, .product-card, .collection-item, .video-card, .brand-logo');
+        hoverElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                gsap.to(cursor, { scale: 2, duration: 0.3 });
+                gsap.to(cursorFollower, { scale: 1.5, duration: 0.3 });
+            });
+            el.addEventListener('mouseleave', () => {
+                gsap.to(cursor, { scale: 1, duration: 0.3 });
+                gsap.to(cursorFollower, { scale: 1, duration: 0.3 });
+            });
         });
-        gsap.to(cursorFollower, {
-            x: e.clientX,
-            y: e.clientY,
-            duration: 0.3
-        });
-    });
+    }
 
-    // Cursor hover effects
-    const hoverElements = document.querySelectorAll('a, .product-card, .collection-item, .video-card, .brand-logo');
-    hoverElements.forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            gsap.to(cursor, { scale: 2, duration: 0.3 });
-            gsap.to(cursorFollower, { scale: 1.5, duration: 0.3 });
-        });
-        el.addEventListener('mouseleave', () => {
-            gsap.to(cursor, { scale: 1, duration: 0.3 });
-            gsap.to(cursorFollower, { scale: 1, duration: 0.3 });
-        });
-    });
-
-    // Magnetic effect for logo and sock images
+    // Magnetic effect for logo and sock images - only for non-touch devices
     const magneticLogo = document.getElementById('magneticLogo');
     const hero = document.querySelector('.hero');
     const sockImages = document.querySelectorAll('.sock-float');
 
-    if (magneticLogo && hero) {
+    if (magneticLogo && hero && !isTouchDevice) {
         hero.addEventListener('mousemove', (e) => {
             const rect = magneticLogo.getBoundingClientRect();
             const logoX = rect.left + rect.width / 2;
@@ -516,30 +521,32 @@ document.addEventListener('DOMContentLoaded', function() {
         ease: 'none'
     });
 
-    // Product card magnetic effect
-    document.querySelectorAll('.product-card').forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
+    // Product card magnetic effect - only for non-touch devices
+    if (!isTouchDevice) {
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                gsap.to(card, {
+                    x: x * 0.1,
+                    y: y * 0.1,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
             
-            gsap.to(card, {
-                x: x * 0.1,
-                y: y * 0.1,
-                duration: 0.3,
-                ease: 'power2.out'
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, {
+                    x: 0,
+                    y: 0,
+                    duration: 0.5,
+                    ease: 'elastic.out(1, 0.5)'
+                });
             });
         });
-        
-        card.addEventListener('mouseleave', () => {
-            gsap.to(card, {
-                x: 0,
-                y: 0,
-                duration: 0.5,
-                ease: 'elastic.out(1, 0.5)'
-            });
-        });
-    });
+    }
 
     // Scroll-based color transitions
     ScrollTrigger.create({
